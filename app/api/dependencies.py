@@ -8,6 +8,13 @@ from app.authentication.jwt import decode_access_token
 from app.database.connection import get_db
 from app.database.models.user import User
 
+from collections.abc import Callable
+
+from fastapi import Depends, HTTPException, status
+
+from app.authentication.roles import UserRole
+from app.database.models.user import User
+
 bearer_scheme = HTTPBearer()
 
 
@@ -33,3 +40,21 @@ def get_current_user(
         raise credentials_exception
 
     return user
+
+def require_role(
+    *allowed_roles: UserRole,
+) -> Callable[..., User]:
+    def role_checker(
+        current_user: User = Depends(get_current_user),
+    ) -> User:
+        allowed_values = {role.value for role in allowed_roles}
+
+        if current_user.role not in allowed_values:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this resource",
+            )
+
+        return current_user
+
+    return role_checker

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
+from app.authentication.roles import UserRole
 from app.authentication.password import hash_password
 from app.authentication.schemas import UserRegister, UserResponse
 from app.database.connection import get_db
@@ -41,10 +41,10 @@ def register_user(
         )
 
     user = User(
-        email=payload.email.lower(),
-        password_hash=hash_password(payload.password),
-        full_name=payload.full_name,
-        role="viewer",
+        email=data.email,
+        password_hash=hash_password(data.password),
+        full_name=data.full_name,
+        role=UserRole.VIEWER.value,
     )
 
     db.add(user)

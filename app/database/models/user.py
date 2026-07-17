@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import Boolean, DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
-
+from app.authentication.roles import UserRole
 from app.database.base import Base
 
 
@@ -37,7 +37,7 @@ class User(Base):
     role: Mapped[str] = mapped_column(
         String(50),
         nullable=False,
-        default="viewer",
+        default=UserRole.VIEWER.value,
     )
 
     is_active: Mapped[bool] = mapped_column(
