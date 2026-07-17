@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     database_url: str
 
+    jwt_secret_key: str
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 15
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
