@@ -1,6 +1,7 @@
 ﻿from fastapi import FastAPI
 
 from app.api.routes.auth import router as auth_router
+from app.api.routes.users import router as users_router
 
 app = FastAPI(
     title="LLM Evaluation Platform",
@@ -8,8 +9,9 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(users_router)
 
 
-@app.get("/health", tags=["health"])
-async def health_check() -> dict[str, str]:
+@app.get("/health")
+async def health():
     return {"status": "healthy"}
