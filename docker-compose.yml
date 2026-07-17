@@ -1,0 +1,30 @@
+﻿services:
+  postgres:
+    image: postgres:16
+    container_name: llm-evaluation-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: eval_user
+      POSTGRES_PASSWORD: eval_password
+      POSTGRES_DB: evaluation_db
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - evaluation_postgres_data:/var/lib/postgresql/data
+      - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U eval_user -d evaluation_db"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  evaluation_postgres_data:
