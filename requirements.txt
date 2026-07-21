@@ -27,3 +27,4 @@ httpx
 ruff
 mypy
 bandit
+numpy
