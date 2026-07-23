@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -21,11 +22,11 @@ class BaseProvider(ABC):
         model: str,
     ) -> ProviderResponse:
         ...
-        
-@abstractmethod
-def embedding(
-    self,
-    *,
-    text: str,
-):
-    ...
+
+    @abstractmethod
+    def embedding(
+        self,
+        *,
+        text: str,
+    ) -> Any:
+        ...

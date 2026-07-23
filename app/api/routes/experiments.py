@@ -47,3 +47,16 @@ def get_experiment(
     return ExperimentService(db).get_experiment(
         experiment_id
     )
+
+
+@router.post(
+    "/{experiment_id}/run",
+    status_code=status.HTTP_200_OK,
+)
+def run_experiment(
+    experiment_id: int,
+    db: Session = Depends(get_db),
+):
+    return ExperimentService(db).run_experiment(
+        experiment_id
+    )
