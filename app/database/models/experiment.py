@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SqlEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -122,6 +122,26 @@ class ExperimentResult(Base):
         nullable=True,
     )
 
+    input_tokens: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    output_tokens: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    total_tokens: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    cost: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+
     exact_match_score: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
@@ -158,4 +178,7 @@ class ExperimentResult(Base):
         back_populates="results",
     )
 
-    dataset_item = relationship("DatasetItem")
+    dataset_item = relationship(
+        "DatasetItem",
+        back_populates="results",
+    )

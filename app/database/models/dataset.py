@@ -11,7 +11,12 @@ class Dataset(Base):
     __tablename__ = "datasets"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
+
+    name: Mapped[str] = mapped_column(
+        String(200),
+        nullable=False,
+    )
+
     description: Mapped[str | None] = mapped_column(Text)
 
     created_at: Mapped[datetime] = mapped_column(
@@ -24,7 +29,7 @@ class Dataset(Base):
         back_populates="dataset",
         cascade="all, delete-orphan",
     )
-    
+
     experiments = relationship(
         "Experiment",
         back_populates="dataset",
@@ -36,13 +41,17 @@ class Dataset(Base):
 class DatasetItem(Base):
     __tablename__ = "dataset_items"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+    )
 
     dataset_id: Mapped[int] = mapped_column(
         ForeignKey("datasets.id", ondelete="CASCADE")
     )
 
     prompt: Mapped[str] = mapped_column(Text)
+
     expected_output: Mapped[str] = mapped_column(Text)
 
     item_metadata: Mapped[dict | None] = mapped_column(
@@ -54,4 +63,10 @@ class DatasetItem(Base):
     dataset = relationship(
         "Dataset",
         back_populates="items",
+    )
+
+    results = relationship(
+        "ExperimentResult",
+        back_populates="dataset_item",
+        cascade="all, delete-orphan",
     )
