@@ -4,7 +4,7 @@ from app.api.routes.auth import router as auth_router
 from app.api.routes.users import router as users_router
 from app.api.routes.admin import router as admin_router
 from app.api.routes.datasets import router as datasets_router
-
+from app.api.routes import experiments
 app = FastAPI(
     title="LLM Evaluation Platform",
     version="0.1.0",
@@ -16,6 +16,7 @@ app.include_router(admin_router)
 app.include_router(evaluations_router)
 app.include_router(datasets_router)
 app.include_router(datasets_router)
+app.include_router(experiments.router)
 @app.get("/health")
 async def health():
     return {"status": "healthy"}

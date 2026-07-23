@@ -24,6 +24,13 @@ class Dataset(Base):
         back_populates="dataset",
         cascade="all, delete-orphan",
     )
+    
+    experiments = relationship(
+        "Experiment",
+        back_populates="dataset",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
 
 class DatasetItem(Base):
