@@ -1,6 +1,9 @@
+from time import perf_counter
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.database.models.experiment import ExperimentStatus
 from app.datasets.repository import DatasetRepository
 from app.experiments.repository import ExperimentRepository
 from app.experiments.schemas import ExperimentCreate
@@ -74,28 +77,70 @@ class ExperimentService:
                 detail=str(exc),
             ) from exc
 
+        self.repository.update_status(
+            experiment,
+            ExperimentStatus.RUNNING,
+        )
+
         results = []
 
-        for item in dataset.items:
-            response = provider.generate(
-                prompt=item.prompt,
-                model=experiment.model_name,
+        try:
+            for item in dataset.items:
+                started_at = perf_counter()
+
+                response = provider.generate(
+                    prompt=item.prompt,
+                    model=experiment.model_name,
+                )
+
+                latency_ms = int(
+                    (perf_counter() - started_at) * 1000
+                )
+
+                saved_result = self.repository.create_result(
+                    experiment_id=experiment.id,
+                    dataset_item_id=item.id,
+                    model_output=response.text,
+                    input_tokens=response.input_tokens,
+                    output_tokens=response.output_tokens,
+                    total_tokens=response.total_tokens,
+                    cost=response.cost,
+                    latency_ms=latency_ms,
+                )
+
+                results.append(
+                    {
+                        "result_id": saved_result.id,
+                        "dataset_item_id": item.id,
+                        "model_output": response.text,
+                        "input_tokens": response.input_tokens,
+                        "output_tokens": response.output_tokens,
+                        "total_tokens": response.total_tokens,
+                        "cost": response.cost,
+                        "latency_ms": latency_ms,
+                    }
+                )
+
+            self.repository.update_status(
+                experiment,
+                ExperimentStatus.COMPLETED,
             )
 
-            results.append(
-                {
-                    "dataset_item_id": item.id,
-                    "model_output": response.text,
-                    "input_tokens": response.input_tokens,
-                    "output_tokens": response.output_tokens,
-                    "total_tokens": response.total_tokens,
-                    "cost": response.cost,
-                }
+        except Exception as exc:
+            self.repository.update_status(
+                experiment,
+                ExperimentStatus.FAILED,
+                error_message=str(exc),
             )
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Experiment execution failed",
+            ) from exc
 
         return {
             "experiment_id": experiment.id,
-            "status": "completed",
+            "status": ExperimentStatus.COMPLETED.value,
             "results": results,
         }
 

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session, selectinload
 
 from app.database.models.experiment import (
@@ -62,6 +64,17 @@ class ExperimentRepository:
         experiment.status = status
         experiment.error_message = error_message
 
+        if status == ExperimentStatus.RUNNING:
+            experiment.started_at = datetime.utcnow()
+            experiment.completed_at = None
+
+        elif status == ExperimentStatus.COMPLETED:
+            experiment.completed_at = datetime.utcnow()
+            experiment.error_message = None
+
+        elif status == ExperimentStatus.FAILED:
+            experiment.completed_at = datetime.utcnow()
+
         self.db.commit()
         self.db.refresh(experiment)
 
@@ -69,9 +82,14 @@ class ExperimentRepository:
 
     def create_result(
         self,
+        *,
         experiment_id: int,
         dataset_item_id: int,
         model_output: str | None = None,
+        input_tokens: int | None = None,
+        output_tokens: int | None = None,
+        total_tokens: int | None = None,
+        cost: float | None = None,
         exact_match_score: int | None = None,
         semantic_similarity_score: str | None = None,
         judge_score: str | None = None,
@@ -82,6 +100,10 @@ class ExperimentRepository:
             experiment_id=experiment_id,
             dataset_item_id=dataset_item_id,
             model_output=model_output,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            total_tokens=total_tokens,
+            cost=cost,
             exact_match_score=exact_match_score,
             semantic_similarity_score=semantic_similarity_score,
             judge_score=judge_score,
