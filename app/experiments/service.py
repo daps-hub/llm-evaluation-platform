@@ -2,10 +2,12 @@ from time import perf_counter
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-
+from app.evaluations.exact_match import ExactMatchEvaluator
+from app.evaluations.exact_match import ExactMatchEvaluator
 from app.database.models.experiment import ExperimentStatus
 from app.datasets.repository import DatasetRepository
 from app.experiments.repository import ExperimentRepository
+from app.evaluations.exact_match import ExactMatchEvaluator
 from app.experiments.schemas import (
     ExperimentCreate,
     ExperimentResultResponse,
@@ -110,6 +112,16 @@ class ExperimentService:
                     cost=response.cost,
                     latency_ms=latency_ms,
                 )
+                
+                exact_match_score = ExactMatchEvaluator.evaluate(
+                    model_output=response.text,
+                    expected_output=item.expected_output,
+                )
+
+                saved_result = self.repository.update_result_scores(
+                    result=saved_result,
+                    exact_match_score=exact_match_score,
+                )
 
                 results.append(
                     {
@@ -121,6 +133,7 @@ class ExperimentService:
                         "total_tokens": response.total_tokens,
                         "cost": response.cost,
                         "latency_ms": latency_ms,
+                        "exact_match_score": saved_result.exact_match_score,
                     }
                 )
 

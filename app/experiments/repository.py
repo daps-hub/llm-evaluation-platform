@@ -117,7 +117,27 @@ class ExperimentRepository:
         self.db.refresh(result)
 
         return result
+    
+    
+    
+    def update_result_scores(
+        self,
+        result,
+        exact_match_score: float | None = None,
+        semantic_similarity_score: float | None = None,
+        judge_score: float | None = None,
+    ):
+        result.exact_match_score = exact_match_score
+        result.semantic_similarity_score = (
+            semantic_similarity_score
+        )
+        result.judge_score = judge_score
 
+        self.db.commit()
+        self.db.refresh(result)
+
+        return result
+    
     def get_results_by_experiment(
         self,
         experiment_id: int,
