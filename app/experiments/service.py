@@ -6,7 +6,10 @@ from sqlalchemy.orm import Session
 from app.database.models.experiment import ExperimentStatus
 from app.datasets.repository import DatasetRepository
 from app.experiments.repository import ExperimentRepository
-from app.experiments.schemas import ExperimentCreate
+from app.experiments.schemas import (
+    ExperimentCreate,
+    ExperimentResultResponse,
+)
 from app.providers.factory import ProviderFactory
 
 
@@ -156,3 +159,44 @@ class ExperimentService:
             )
 
         return experiment
+
+    def get_experiment_results(
+        self,
+        experiment_id: int,
+    ) -> list[ExperimentResultResponse]:
+        experiment = self.repository.get_experiment(
+            experiment_id
+        )
+
+        if experiment is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Experiment not found",
+            )
+
+        results = self.repository.get_results_by_experiment(
+            experiment_id
+        )
+
+        return [
+            ExperimentResultResponse.model_validate(result)
+            for result in results
+        ]
+
+    def get_result(
+        self,
+        result_id: int,
+    ) -> ExperimentResultResponse:
+        result = self.repository.get_result(
+            result_id
+        )
+
+        if result is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Experiment result not found",
+            )
+
+        return ExperimentResultResponse.model_validate(
+            result
+        )

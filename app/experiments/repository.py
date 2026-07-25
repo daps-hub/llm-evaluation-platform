@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from sqlalchemy.orm import Session, selectinload
 
@@ -89,7 +90,7 @@ class ExperimentRepository:
         input_tokens: int | None = None,
         output_tokens: int | None = None,
         total_tokens: int | None = None,
-        cost: float | None = None,
+        cost: Decimal | float | None = None,
         exact_match_score: int | None = None,
         semantic_similarity_score: str | None = None,
         judge_score: str | None = None,
@@ -116,3 +117,26 @@ class ExperimentRepository:
         self.db.refresh(result)
 
         return result
+
+    def get_results_by_experiment(
+        self,
+        experiment_id: int,
+    ) -> list[ExperimentResult]:
+        return (
+            self.db.query(ExperimentResult)
+            .filter(
+                ExperimentResult.experiment_id == experiment_id
+            )
+            .order_by(ExperimentResult.created_at.asc())
+            .all()
+        )
+
+    def get_result(
+        self,
+        result_id: int,
+    ) -> ExperimentResult | None:
+        return (
+            self.db.query(ExperimentResult)
+            .filter(ExperimentResult.id == result_id)
+            .first()
+        )

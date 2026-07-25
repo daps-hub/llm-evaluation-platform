@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -19,11 +20,19 @@ class ExperimentResultResponse(BaseModel):
     id: int
     experiment_id: int
     dataset_item_id: int
+
     model_output: str | None = None
+
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    total_tokens: int | None = None
+    cost: Decimal | None = None
+    latency_ms: int | None = None
+
     exact_match_score: int | None = None
     semantic_similarity_score: str | None = None
     judge_score: str | None = None
-    latency_ms: int | None = None
+
     error_message: str | None = None
     created_at: datetime
 
@@ -42,6 +51,7 @@ class ExperimentResponse(BaseModel):
     created_at: datetime
     started_at: datetime | None = None
     completed_at: datetime | None = None
+
     results: list[ExperimentResultResponse] = Field(
         default_factory=list
     )
