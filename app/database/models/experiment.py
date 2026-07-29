@@ -147,13 +147,18 @@ class ExperimentResult(Base):
         nullable=True,
     )
 
-    semantic_similarity_score: Mapped[str | None] = mapped_column(
-        String(50),
+    semantic_similarity_score: Mapped[float | None] = mapped_column(
+        Float,
         nullable=True,
     )
 
-    judge_score: Mapped[str | None] = mapped_column(
-        String(50),
+    judge_score: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+    
+    judge_reasoning: Mapped[str | None] = mapped_column(
+        Text,
         nullable=True,
     )
 
@@ -181,4 +186,19 @@ class ExperimentResult(Base):
     dataset_item = relationship(
         "DatasetItem",
         back_populates="results",
+    )
+
+    generation_cost: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+
+    judge_cost: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
+    )
+
+    total_cost: Mapped[float | None] = mapped_column(
+        Float,
+        nullable=True,
     )

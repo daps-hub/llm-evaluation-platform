@@ -91,9 +91,12 @@ class ExperimentRepository:
         output_tokens: int | None = None,
         total_tokens: int | None = None,
         cost: Decimal | float | None = None,
-        exact_match_score: int | None = None,
-        semantic_similarity_score: str | None = None,
-        judge_score: str | None = None,
+        generation_cost: Decimal | float | None = None,
+        judge_cost: Decimal | float | None = None,
+        total_cost: Decimal | float | None = None,
+        exact_match_score: float | None = None,
+        semantic_similarity_score: float | None = None,
+        judge_score: float | None = None,
         latency_ms: int | None = None,
         error_message: str | None = None,
     ) -> ExperimentResult:
@@ -105,6 +108,9 @@ class ExperimentRepository:
             output_tokens=output_tokens,
             total_tokens=total_tokens,
             cost=cost,
+            generation_cost=generation_cost,
+            judge_cost=judge_cost,
+            total_cost=total_cost,
             exact_match_score=exact_match_score,
             semantic_similarity_score=semantic_similarity_score,
             judge_score=judge_score,
@@ -117,27 +123,32 @@ class ExperimentRepository:
         self.db.refresh(result)
 
         return result
-    
-    
-    
+
     def update_result_scores(
         self,
-        result,
+        result: ExperimentResult,
         exact_match_score: float | None = None,
         semantic_similarity_score: float | None = None,
         judge_score: float | None = None,
-    ):
+        judge_reasoning: str | None = None,
+        generation_cost: Decimal | float | None = None,
+        judge_cost: Decimal | float | None = None,
+        total_cost: Decimal | float | None = None,
+    ) -> ExperimentResult:
         result.exact_match_score = exact_match_score
         result.semantic_similarity_score = (
             semantic_similarity_score
         )
         result.judge_score = judge_score
-
+        result.judge_reasoning = judge_reasoning
+        result.generation_cost = generation_cost
+        result.judge_cost = judge_cost
+        result.total_cost = total_cost
         self.db.commit()
         self.db.refresh(result)
 
         return result
-    
+
     def get_results_by_experiment(
         self,
         experiment_id: int,

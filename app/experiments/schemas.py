@@ -30,12 +30,14 @@ class ExperimentResultResponse(BaseModel):
     latency_ms: int | None = None
 
     exact_match_score: int | None = None
-    semantic_similarity_score: str | None = None
-    judge_score: str | None = None
-
+    semantic_similarity_score: float | None = None
+    judge_score: float | None = None
+    judge_reasoning: str | None = None
     error_message: str | None = None
     created_at: datetime
-
+    generation_cost: float | None = None
+    judge_cost: float | None = None
+    total_cost: float | None = None
 
 class ExperimentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
