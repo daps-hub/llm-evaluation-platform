@@ -26,7 +26,7 @@ class ExperimentResultResponse(BaseModel):
     input_tokens: int | None = None
     output_tokens: int | None = None
     total_tokens: int | None = None
-    cost: Decimal | None = None
+    cost: float | None = None
     latency_ms: int | None = None
 
     exact_match_score: int | None = None
