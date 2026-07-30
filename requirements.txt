@@ -28,3 +28,7 @@ ruff
 mypy
 bandit
 numpy
+
+sentence-transformers
+scikit-learn
+torch
