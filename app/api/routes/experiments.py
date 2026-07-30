@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-
+from app.experiments.dashboard_schema import DashboardSummary
+from app.experiments.dashboard_service import DashboardService
 from app.database.connection import get_db
 from app.experiments.schemas import (
     ExperimentCreate,
@@ -90,3 +91,16 @@ def get_experiment_result(
     return ExperimentService(db).get_result(
         result_id
     )
+
+@router.get(
+    "/{experiment_id}/dashboard",
+    response_model=DashboardSummary,
+)
+def dashboard(
+    experiment_id: int,
+    db: Session = Depends(get_db),
+):
+
+    service = DashboardService(db)
+
+    return service.summary(experiment_id)
