@@ -2,6 +2,14 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.experiments.dashboard_schema import DashboardSummary
 from app.experiments.dashboard_service import DashboardService
+from app.experiments.dashboard_schema import (
+    CostHistoryItem,
+    DashboardSummary,
+    JudgeScoreHistoryItem,
+    LatencyHistoryItem,
+    TokenHistoryItem,
+)
+from app.experiments.dashboard_service import DashboardService
 from app.database.connection import get_db
 from app.experiments.schemas import (
     ExperimentCreate,
@@ -104,3 +112,70 @@ def dashboard(
     service = DashboardService(db)
 
     return service.summary(experiment_id)
+
+@router.get(
+    "/{experiment_id}/dashboard",
+    response_model=DashboardSummary,
+)
+def get_dashboard_summary(
+    experiment_id: int,
+    db: Session = Depends(get_db),
+):
+    service = DashboardService(db)
+    summary = service.summary(experiment_id)
+
+    if summary is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No results found for this experiment",
+        )
+
+    return summary
+
+
+@router.get(
+    "/{experiment_id}/dashboard/cost-history",
+    response_model=list[CostHistoryItem],
+)
+def get_cost_history(
+    experiment_id: int,
+    db: Session = Depends(get_db),
+):
+    service = DashboardService(db)
+    return service.cost_history(experiment_id)
+
+
+@router.get(
+    "/{experiment_id}/dashboard/latency-history",
+    response_model=list[LatencyHistoryItem],
+)
+def get_latency_history(
+    experiment_id: int,
+    db: Session = Depends(get_db),
+):
+    service = DashboardService(db)
+    return service.latency_history(experiment_id)
+
+
+@router.get(
+    "/{experiment_id}/dashboard/judge-score-history",
+    response_model=list[JudgeScoreHistoryItem],
+)
+def get_judge_score_history(
+    experiment_id: int,
+    db: Session = Depends(get_db),
+):
+    service = DashboardService(db)
+    return service.judge_score_history(experiment_id)
+
+
+@router.get(
+    "/{experiment_id}/dashboard/token-history",
+    response_model=list[TokenHistoryItem],
+)
+def get_token_history(
+    experiment_id: int,
+    db: Session = Depends(get_db),
+):
+    service = DashboardService(db)
+    return service.token_history(experiment_id)
