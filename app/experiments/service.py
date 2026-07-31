@@ -292,6 +292,45 @@ class ExperimentService:
 
         return experiment
 
+    def _build_result_response(
+        self,
+        result,
+    ) -> ExperimentResultResponse:
+        dataset_item = result.dataset_item
+
+        return ExperimentResultResponse(
+            id=result.id,
+            experiment_id=result.experiment_id,
+            dataset_item_id=result.dataset_item_id,
+            prompt=(
+                dataset_item.prompt
+                if dataset_item is not None
+                else None
+            ),
+            expected_output=(
+                dataset_item.expected_output
+                if dataset_item is not None
+                else None
+            ),
+            model_output=result.model_output,
+            input_tokens=result.input_tokens,
+            output_tokens=result.output_tokens,
+            total_tokens=result.total_tokens,
+            latency_ms=result.latency_ms,
+            cost=result.cost,
+            generation_cost=result.generation_cost,
+            judge_cost=result.judge_cost,
+            total_cost=result.total_cost,
+            exact_match_score=result.exact_match_score,
+            semantic_similarity_score=(
+                result.semantic_similarity_score
+            ),
+            judge_score=result.judge_score,
+            judge_reasoning=result.judge_reasoning,
+            error_message=result.error_message,
+            created_at=result.created_at,
+        )
+
     def get_experiment_results(
         self,
         experiment_id: int,
@@ -313,9 +352,7 @@ class ExperimentService:
         )
 
         return [
-            ExperimentResultResponse.model_validate(
-                result
-            )
+            self._build_result_response(result)
             for result in results
         ]
 
@@ -333,6 +370,4 @@ class ExperimentService:
                 detail="Experiment result not found",
             )
 
-        return ExperimentResultResponse.model_validate(
-            result
-        )
+        return self._build_result_response(result)

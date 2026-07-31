@@ -1,5 +1,4 @@
 from datetime import datetime
-from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -21,23 +20,38 @@ class ExperimentResultResponse(BaseModel):
     experiment_id: int
     dataset_item_id: int
 
+    # Dataset information
+    prompt: str | None = None
+    expected_output: str | None = None
+
+    # Model output
     model_output: str | None = None
 
+    # Token usage
     input_tokens: int | None = None
     output_tokens: int | None = None
     total_tokens: int | None = None
-    cost: float | None = None
+
+    # Performance
     latency_ms: int | None = None
 
+    # Cost
+    cost: float | None = None
+    generation_cost: float | None = None
+    judge_cost: float | None = None
+    total_cost: float | None = None
+
+    # Evaluation scores
     exact_match_score: int | None = None
     semantic_similarity_score: float | None = None
     judge_score: float | None = None
     judge_reasoning: str | None = None
+
+    # Errors
     error_message: str | None = None
+
     created_at: datetime
-    generation_cost: float | None = None
-    judge_cost: float | None = None
-    total_cost: float | None = None
+
 
 class ExperimentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -50,6 +64,7 @@ class ExperimentResponse(BaseModel):
     model_name: str
     status: ExperimentStatus
     error_message: str | None = None
+
     created_at: datetime
     started_at: datetime | None = None
     completed_at: datetime | None = None
