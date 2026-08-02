@@ -3,7 +3,16 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 class SemanticSimilarityEvaluator:
-    _model = SentenceTransformer("all-MiniLM-L6-v2")
+    _model: SentenceTransformer | None = None
+
+    @classmethod
+    def _get_model(cls) -> SentenceTransformer:
+        if cls._model is None:
+            cls._model = SentenceTransformer(
+                "all-MiniLM-L6-v2"
+            )
+
+        return cls._model
 
     @classmethod
     def evaluate(
@@ -11,16 +20,21 @@ class SemanticSimilarityEvaluator:
         expected_output: str,
         model_output: str,
     ) -> float:
-        embeddings = cls._model.encode(
+        if not expected_output or not model_output:
+            return 0.0
+
+        model = cls._get_model()
+
+        embeddings = model.encode(
             [
                 expected_output,
                 model_output,
             ]
         )
 
-        similarity = cosine_similarity(
+        score = cosine_similarity(
             [embeddings[0]],
             [embeddings[1]],
         )[0][0]
 
-        return float(similarity)
+        return float(score)
