@@ -31,7 +31,6 @@ numpy
 
 sentence-transformers
 scikit-learn
-torch
 psycopg2-binary
 
 email-validator>=2.2.0
