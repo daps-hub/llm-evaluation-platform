@@ -27,3 +27,10 @@ httpx
 ruff
 mypy
 bandit
+numpy
+
+sentence-transformers
+scikit-learn
+psycopg2-binary
+
+email-validator>=2.2.0

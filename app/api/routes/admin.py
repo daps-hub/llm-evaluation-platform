@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from app.api.dependencies import require_role
+from  app.authentication.dependencies import require_role
 from app.authentication.roles import UserRole
 from app.database.models.user import User
 
